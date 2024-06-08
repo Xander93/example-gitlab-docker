@@ -1,20 +1,42 @@
 version: '3.7'
 services:
-  gitlab:
+  gitlab_web:
     image: gitlab/gitlab-ce:latest
-    container_name: gitlab
+    container_name: gitlab_web
     restart: always
     hostname: 'gitlab.example.com'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://gitlab.example.com'
-        gitlab_rails['lfs_enabled'] = true
-        gitlab_rails['gitlab_shell_ssh_port'] = 2224
     ports:
       - '80:80'
       - '443:443'
+
+  gitlab_ssh:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab_ssh
+    restart: always
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 2224
+    ports:
       - '2224:22'
-    volumes:
-      - ./config:/etc/gitlab
-      - ./logs:/var/log/gitlab
-      - ./data:/var/opt/gitlab
+
+  gitlab_registry:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab_registry
+    restart: always
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['registry_enabled'] = true
+    ports:
+      - '5000:5000'
+
+  gitlab_postgresql_database:
+    image: postgres:latest
+    container_name: gitlab_postgresql_database
+    restart: always
+    environment:
+      POSTGRES_USER: gitlab
+      POSTGRES_PASSWORD: gitlab
+      POSTGRES_DB: gitlabhq_production
