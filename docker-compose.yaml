@@ -36,4 +36,4 @@ services:
       POSTGRES_PASSWORD: gitlab
       POSTGRES_DB: gitlabhq_production
     volumes:
-      - ./postgresql-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
